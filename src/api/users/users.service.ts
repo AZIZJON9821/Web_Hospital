@@ -115,6 +115,18 @@ async updateTelegramChatId(userId: number, chatId: number) {
   await this.userRepository.update(userId, { telegram_chat_id: chatId });
 }
 
+
+// users.service.ts
+
+async findByTelegramId(chatId: number): Promise<UsersEntity | null> {
+  return this.userRepository.findOne({ where: { telegram_chat_id: chatId } });
+}
+
+async updateTelegramId(userId: number, chatId: number) {
+  await this.userRepository.update(userId, { telegram_chat_id: chatId });
+}
+
+
  async login(email: string, password: string) {
   const user = await this.userRepository.findOne({
     where: { email },

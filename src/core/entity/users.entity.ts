@@ -42,7 +42,7 @@ experience_years: number;
     @Column({ nullable: true })
     verificationCode: string;
 
-@Column({ nullable: true })
+@Column({ type: 'bigint', nullable: true })
 telegram_chat_id: number;
 
 @OneToMany(() => AppointmentsEntity, (a) => a.user)
