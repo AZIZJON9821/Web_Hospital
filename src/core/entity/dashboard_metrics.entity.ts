@@ -11,8 +11,9 @@ export class Dashboard_metricsEntity{
     @Column({type:'varchar'})
     type:string
 
-    @Column({type:'int'})
-    value: number;
+@Column({ type: 'numeric' }) // yoki 'float'
+value: number;
+
 
     @Column({type:'date'})
     recorded_at:string;

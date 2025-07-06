@@ -1,3 +1,4 @@
+import { AppointmentsEntity } from 'src/core/entity/appointments.entity';
 import { BaseEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('users')
@@ -5,11 +6,12 @@ export class UsersEntity extends BaseEntity{
     @PrimaryGeneratedColumn()
     id:number
 
-    @Column({type:'varchar',unique:true})
-    full_name:string;
+@Column({ name: 'full_name', nullable: false })
+full_name: string;
 
-    @Column({type:'varchar',unique:true})
-    phone:string;
+
+@Column({ nullable: false })
+phone: string;
 
     @Column({type:'varchar',unique:true})
     email:string;
@@ -19,21 +21,35 @@ export class UsersEntity extends BaseEntity{
 
     @Column({type:'varchar'})
     role:string;
+      @Column({ type: 'varchar', nullable: true }) 
+  gender: string;
 
-    @Column({type:'varchar'})
-    birth_date:string;
 
+@Column()
+birth_date: Date;
     @Column({type:'varchar'})
     address:string;
 
-    @Column({type:'varchar'})
-    specialization:string;
+@Column({ nullable: true })
+specialization: string;
 
-    @Column({type:'int'})
-    experience_years:number;
+@Column({ nullable: true })
+experience_years: number;
 
     @CreateDateColumn()
     created_at:Date
+
+    @Column({ nullable: true })
+    verificationCode: string;
+
+@Column({ nullable: true })
+telegram_chat_id: number;
+
+@OneToMany(() => AppointmentsEntity, (a) => a.user)
+appointmentsAsUser: AppointmentsEntity[];
+
+@OneToMany(() => AppointmentsEntity, (a) => a.doctor)
+appointmentsAsDoctor: AppointmentsEntity[];
 
 // @OneToMany(() => Schedule, schedule => schedule.doctor)
 //   schedules: Schedule[];

@@ -7,68 +7,72 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class DashboardMetricsService {
-  constructor(@InjectRepository(Dashboard_metricsEntity)private readonly repo:Repository<Dashboard_metricsEntity>) { }
+  constructor(@InjectRepository(Dashboard_metricsEntity) private readonly repo: Repository<Dashboard_metricsEntity>) {}
 
   async create(createDashboardMetricDto: CreateDashboardMetricDto) {
     try {
-      const dashboard=this.repo.create(createDashboardMetricDto)
-      await this.repo.save(dashboard)
-      return dashboard
+      const dashboard = this.repo.create(createDashboardMetricDto);
+      await this.repo.save(dashboard);
+      return dashboard;
     } catch (error) {
-      throw new InternalServerErrorException(error)
+      throw new InternalServerErrorException(error);
     }
-  
   }
 
   async findAll() {
     try {
-      const dashboard=await this.repo.find({
-        select:['id','user_id','type','value','recorded_at'],
-        order:{'created_at':'DESC'}
-      })
-      return dashboard;
+      const dashboards = await this.repo.find({
+        select: ['id', 'user_id', 'type', 'value', 'recorded_at'],
+        order: { 'created_at': 'DESC' },
+      });
+      return dashboards;
     } catch (error) {
-      throw new InternalServerErrorException(error)
+      throw new InternalServerErrorException(error);
     }
   }
 
   async findOne(id: number) {
     try {
-      const dashboard=await this.repo.findOne({where:{id},
-      select:['id','user_id','type','value','recorded_at']})
-      if(!dashboard){
-        throw new NotFoundException("Not Found")
+      const dashboard = await this.repo.findOne({
+        where: { id },
+        select: ['id', 'user_id', 'type', 'value', 'recorded_at'],
+      });
+      if (!dashboard) {
+        throw new NotFoundException('Dashboard metric not found');
       }
       return dashboard;
     } catch (error) {
-      throw new InternalServerErrorException(error)
+      throw new InternalServerErrorException(error);
     }
   }
 
   async update(id: number, updateDashboardMetricDto: UpdateDashboardMetricDto) {
     try {
-     const dashboard =await this.repo.findOne({where:{id},})
-     if(!dashboard){
-      throw new NotFoundException('Not Found')
-     } 
-     await this.repo.findOne({where:{id},
-    select:['id','user_id','type','value','recorded_at']})
-    return dashboard;
+      const dashboard = await this.repo.findOne({ where: { id } });
+      if (!dashboard) {
+        throw new NotFoundException('Dashboard metric not found');
+      }
+      await this.repo.update(id, updateDashboardMetricDto);
+      return await this.repo.findOne({
+        where: { id },
+        select: ['id', 'user_id', 'type', 'value', 'recorded_at'],
+      });
     } catch (error) {
-      throw new InternalServerErrorException(error)
+      throw new InternalServerErrorException(error);
     }
   }
 
   async remove(id: number) {
     try {
-     const dashboard=await this.repo.findOne({where:{id}})
-     if(!dashboard){
-      throw new  NotFoundException('Not Found')
-     } 
-     await this.repo.delete({id})
-     return {message:'success'}
+      const dashboard = await this.repo.findOne({ where: { id } });
+      if (!dashboard) {
+        throw new NotFoundException('Dashboard metric not found');
+      }
+      await this.repo.delete(id);
+      return { message: 'Dashboard metric successfully deleted' };
     } catch (error) {
-      throw new InternalServerErrorException(error)
+      throw new InternalServerErrorException(error);
     }
   }
 }
+

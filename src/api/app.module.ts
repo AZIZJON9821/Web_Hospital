@@ -15,11 +15,16 @@ import { Message_queueEntity } from 'src/core/entity/message_queue.entity';
 import { Dashboard_metricsEntity } from 'src/core/entity/dashboard_metrics.entity';
 import { scheduleEntity } from 'src/core/entity/schedules.entity';
 import { Appointment_logsEntity } from 'src/core/entity/appointment_logs.entity';
-import { AppoinmentsEntity } from 'src/core/entity/appointments.entity';
+import { AppointmentsEntity } from 'src/core/entity/appointments.entity';
 import { Feedbacks } from 'src/core/entity/feedbacks.entity';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './users/users.module';
+import { TelegramModule } from './telegram/telegram.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       envFilePath:'.env',
       isGlobal:true
@@ -29,15 +34,18 @@ import { Feedbacks } from 'src/core/entity/feedbacks.entity';
       url:process.env.DB_URL,
       synchronize:true,
       autoLoadEntities:true,
-      entities:[NotificationsEntity,Message_queueEntity,Dashboard_metricsEntity,scheduleEntity,Appointment_logsEntity,AppoinmentsEntity,Feedbacks]
+      entities:[NotificationsEntity,Message_queueEntity,Dashboard_metricsEntity,scheduleEntity,Appointment_logsEntity,AppointmentsEntity,Feedbacks]
     }),
-    NotificationsModule,
-    MessageQueueModule,
-    DashboardMetricsModule,
+    AuthModule,
+    UserModule,
     SchedulesModule,
     AppointmentsModule,
     AppointmentLogsModule,
     FeedbacksModule,
+    NotificationsModule,
+    MessageQueueModule,
+    DashboardMetricsModule,
+    TelegramModule
   ],
   controllers: [],
   providers: [AppService],

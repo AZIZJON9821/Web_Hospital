@@ -45,13 +45,12 @@ export class NotificationsService {
 
   async update(id: number, updateNotificationDto: UpdateNotificationDto) {
     try {
-     const notification=await this.repo.findOne({where:{id}})
+     const notification=await this.repo.preload({id,...updateNotificationDto})
      if(!notification){
       throw new NotFoundException('Not Found')
      } 
-     await this.repo.findOne({where:{id},
-    select:['id','user_id','message','is_read']})
-    return notification
+     await this.repo.save(notification)
+     return notification
     } catch (error) {
       throw new InternalServerErrorException(error)
     }
@@ -70,3 +69,4 @@ export class NotificationsService {
     }
   }
 }
+

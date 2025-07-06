@@ -4,74 +4,71 @@ import { UpdateScheduleDto } from './dto/update-schedule.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { scheduleEntity } from 'src/core/entity/schedules.entity';
 import { Repository } from 'typeorm';
-import { error } from 'console';
 
 @Injectable()
 export class SchedulesService {
-constructor(@InjectRepository(scheduleEntity)private readonly repo:Repository<scheduleEntity>){ 
-}
+  constructor(@InjectRepository(scheduleEntity) private readonly repo: Repository<scheduleEntity>) {}
 
   async create(createScheduleDto: CreateScheduleDto) {
     try {
-      const schedule=await this.repo.create(createScheduleDto)
-      await this.repo.save(schedule)
-      return schedule
+      const schedule = this.repo.create(createScheduleDto);
+      await this.repo.save(schedule);
+      return schedule;
     } catch (error) {
-      throw new InternalServerErrorException(error)
+      throw new InternalServerErrorException(error);
     }
   }
 
   async findAll() {
     try {
-      const schedule=await this.repo.find({select:['id','doctor_id','weekday','start_time','end_time'],
-        order:{'created_at':'DESC'}
-      })
-      return schedule;
+      return await this.repo.find({
+        select: ['id', 'doctor_id', 'weekday', 'start_time', 'end_time'],
+        order: { created_at: 'DESC' },
+      });
     } catch (error) {
-      throw new InternalServerErrorException(error)
+      throw new InternalServerErrorException(error);
     }
   }
 
   async findOne(id: number) {
     try {
-     const schedule=await this.repo.findOne({
-      where:{id},
-      select:['id','doctor_id','weekday','start_time','end_time']
-     }) 
-     if(!schedule){
-      throw new NotFoundException('Not Found')
-     }
-     return schedule
+      const schedule = await this.repo.findOne({
+        where: { id },
+        select: ['id', 'doctor_id', 'weekday', 'start_time', 'end_time'],
+      });
+      if (!schedule) {
+        throw new NotFoundException('Schedule not found');
+      }
+      return schedule;
     } catch (error) {
-      throw new InternalServerErrorException(error)
+      throw new InternalServerErrorException(error);
     }
   }
 
   async update(id: number, updateScheduleDto: UpdateScheduleDto) {
     try {
-     const schedule = await this.repo.findOne({where:{id},}) 
-     if(!schedule){
-      throw new NotFoundException("Not Found")
-     }
-     await this.repo.update({id},updateScheduleDto);
-     const updateSchedule=await this.repo.findOne({where:{id},
-    select:['id','doctor_id','weekday','start_time','end_time']})
-    return updateSchedule
+      const schedule = await this.repo.preload({ id, ...updateScheduleDto });
+      if (!schedule) {
+        throw new NotFoundException('Schedule not found');
+      }
+      await this.repo.save(schedule);
+      return schedule;
     } catch (error) {
-      throw new InternalServerErrorException(error)
+      throw new InternalServerErrorException(error);
     }
   }
 
   async remove(id: number) {
     try {
-      const schedule = await this.repo.findOne({where:{id},}) 
-      if(!schedule){
-       throw new NotFoundException("Not Found")
+      const schedule = await this.repo.findOne({ where: { id } });
+      if (!schedule) {
+        throw new NotFoundException('Schedule not found');
       }
-      await this.repo.delete({id})
-      return {message:'success'}
+      await this.repo.delete(id);
+      return { message: 'Schedule successfully removed' };
     } catch (error) {
-      throw new InternalServerErrorException(error)
+      throw new InternalServerErrorException(error);
     }
   }
 }
+

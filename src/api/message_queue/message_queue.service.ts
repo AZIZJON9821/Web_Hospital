@@ -46,13 +46,15 @@ export class MessageQueueService {
 
   async update(id: number, updateMessageQueueDto: UpdateMessageQueueDto) {
     try {
-     const message = await this.repo.findOne({where:{id}})
-     if(!message){
+     const message = await this.repo.preload({
+      id,
+      ...updateMessageQueueDto
+    })
+    if(!message){
       throw new NotFoundException('Not Found')
      } 
-     await this.repo.findOne({where:{id},
-    select:['id','user_id','channel','destination','message','status','send_at']})
-    return message;
+     await this.repo.save(message)
+     return message;
     } catch (error) {
       throw new InternalServerErrorException(error)
     }
@@ -70,4 +72,17 @@ export class MessageQueueService {
       throw new InternalServerErrorException(error)
     }
   }
+
+  async findMessageQueueByUserId(userId: number) {
+    try {
+     const message =await this.repo.find({where:{user_id:userId},select:[
+      'id','user_id','channel','destination','message','status','send_at'
+     ],
+    order:{'created_at':'DESC'}})
+    return message; 
+    } catch (error) {
+      throw new InternalServerErrorException(error)
+    }
+  }
 }
+
